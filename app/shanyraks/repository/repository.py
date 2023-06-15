@@ -51,6 +51,14 @@ class ShanyrakRepository:
         )
         return res.modified_count
 
+    def push_shanyrak_by_id(self, id: str, payload: dict) -> int:
+        update_data = {k: v for k, v in payload.items() if v is not None}
+        res = self.database["shanyraks"].update_one(
+            {"_id": ObjectId(id)},
+            {"$push": update_data}
+        )
+        return res.modified_count
+
     def delete_shanyrak_by_id(self, id: str):
         self.database["shanyraks"].delete_one(
             {
