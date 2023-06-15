@@ -1,7 +1,4 @@
-from typing import Any
-
 from fastapi import Depends
-from pydantic import Field
 
 from app.utils import AppModel
 
@@ -11,18 +8,19 @@ from . import router
 from .dependencies import parse_jwt_user_data
 
 
-class GetMyAccountResponse(AppModel):
-    id: Any = Field(alias="_id")
-    email: str
+class UpdateUserRequest(AppModel):
     name: str | None = None
     phone: str | None = None
     city: str | None = None
 
 
-@router.get("/users/me", response_model=GetMyAccountResponse)
-def get_my_account(
+@router.patch("/users/me")
+def patch_my_account(
+    input: UpdateUserRequest,
     jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
-) -> dict[str, str]:
-    user = svc.repository.get_user_by_id(jwt_data.user_id)
-    return user
+) -> int:
+    # print(input)
+    data = svc.repository.update_user_by_id(jwt_data.user_id, input)
+    # print(data)
+    return data

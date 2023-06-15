@@ -9,6 +9,9 @@ from . import router
 class RegisterUserRequest(AppModel):
     email: str
     password: str
+    name: str | None = None
+    phone: str | None = None
+    city: str | None = None
 
 
 class RegisterUserResponse(AppModel):
