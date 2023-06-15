@@ -1,4 +1,7 @@
 from fastapi import Depends
+from typing import List, Any
+
+# from pydantic import Field
 
 from app.utils import AppModel
 # from bson.objectid import ObjectId
@@ -16,6 +19,7 @@ class GetShanyrakResponse(AppModel):
     room_count: int
     description: str
     user_id: str
+    media: List[Any] | None = None
 
 
 @router.get(

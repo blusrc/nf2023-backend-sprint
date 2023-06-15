@@ -1,4 +1,5 @@
 from fastapi import Depends, status
+# from typing import List, Any
 
 from app.utils import AppModel
 # from bson.objectid import ObjectId
@@ -26,9 +27,9 @@ class RegisterShanyrakResponse(AppModel):
     "/", status_code=status.HTTP_201_CREATED
 )
 def register_shanyrak(
-    input: RegisterShanyrakRequest,
+    inpu: RegisterShanyrakRequest,
     jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
 ) -> str:
-    res = svc.repository.create_shanyrak(jwt_data.user_id, input.dict())
+    res = svc.repository.create_shanyrak(jwt_data.user_id, inpu.dict())
     return str(res)

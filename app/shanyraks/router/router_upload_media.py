@@ -18,20 +18,23 @@ def upload_media(
 ) -> Any:
     shanyrak = svc.repository.get_shanyrak_by_id(id)
 
-    if shanyrak is None:
+    if shanyrak is None :
         raise HTTPException(status_code=404, detail="Shanyrak not found")
-
-    if not shanyrak["user_id"] == jwt_data.user_id:
+    if not shanyrak["user_id"] == jwt_data.user_id :
         raise InvalidCredentialsException
 
     media_urls = []
-
     for file in files:
+        # Check if the uploaded file is an image
+        if not file.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="Only images are allowed")
+        # Upload single image
         curr_url = svc.s3_service.upload_file(file.file, file.filename)
+        svc.repository.push_shanyrak_media_by_id(id, {"media": curr_url})
+        # Collect images for db
         media_urls.append(curr_url)
 
-    payload = dict(media=media_urls)
+    # print(media_urls)
 
-    data = svc.repository.push_shanyrak_by_id(id, payload)
-
-    return data
+    # res = svc.repository.push_shanyrak_media_by_id(id, {"media": media_urls})
+    return {"media": media_urls}

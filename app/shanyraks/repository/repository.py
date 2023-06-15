@@ -21,6 +21,7 @@ class ShanyrakRepository:
             "description": user["description"],
             # "password": hash_password(user["password"]),
             "created_at": datetime.utcnow(),
+            "media": []
         }
         print(payload)
         res = self.database["shanyraks"].insert_one(payload)
@@ -51,13 +52,14 @@ class ShanyrakRepository:
         )
         return res.modified_count
 
-    def push_shanyrak_by_id(self, id: str, payload: dict) -> int:
-        update_data = {k: v for k, v in payload.items() if v is not None}
+    def push_shanyrak_media_by_id(self, id: str, payload: dict) -> int:
+        # update_data = {k: v for k, v in payload.items() if v is not None}
+        print(payload)
         res = self.database["shanyraks"].update_one(
             {"_id": ObjectId(id)},
-            {"$push": update_data}
+            {"$push": payload}
         )
-        return res.modified_count
+        return res.acknowledged
 
     def delete_shanyrak_by_id(self, id: str):
         self.database["shanyraks"].delete_one(
@@ -65,3 +67,15 @@ class ShanyrakRepository:
                 "_id": ObjectId(id)
             }
         )
+
+    def delete_shanyrak_media_by_id(self, id: str, payload: dict):
+        shanyrak = self.database["shanyraks"].find_one({"_id": ObjectId(id)})
+
+        result = list(set(shanyrak["media"]) - set(payload["media"]))
+
+        res = self.database["shanyraks"].update_one(
+            {"_id": ObjectId(id)},
+            {"$set": {"media": result}}
+        )
+        
+        return res.acknowledged
