@@ -20,6 +20,7 @@ def upload_media(
 
     if shanyrak is None :
         raise HTTPException(status_code=404, detail="Shanyrak not found")
+
     if not shanyrak["user_id"] == jwt_data.user_id :
         raise InvalidCredentialsException
 
@@ -30,11 +31,9 @@ def upload_media(
             raise HTTPException(status_code=400, detail="Only images are allowed")
         # Upload single image
         curr_url = svc.s3_service.upload_file(file.file, file.filename)
+        # Push individual file
         svc.repository.push_shanyrak_media_by_id(id, {"media": curr_url})
         # Collect images for db
         media_urls.append(curr_url)
 
-    # print(media_urls)
-
-    # res = svc.repository.push_shanyrak_media_by_id(id, {"media": media_urls})
     return {"media": media_urls}
